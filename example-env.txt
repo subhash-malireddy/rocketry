@@ -1,1 +1,2 @@
+API_BASE = <your-api-base>
 API-KEY = <your-api-key>

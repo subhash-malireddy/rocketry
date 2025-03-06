@@ -5,7 +5,11 @@ export const login = async (username: string, password: string) => {
     if (!process.env.API_KEY) {
       throw new Error("API_KEY is not set");
     }
-    const res = await fetch("https://testvm1.rokt.io/api/jsonql", {
+
+    if (!process.env.API_BASE) {
+      throw new Error("API_KEY is not set");
+    }
+    const res = await fetch(new URL("jsonql", process.env.API_BASE), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
