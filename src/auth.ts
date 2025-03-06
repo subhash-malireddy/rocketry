@@ -2,11 +2,14 @@ import { cookies } from "next/headers";
 
 export const login = async (username: string, password: string) => {
   try {
+    if (!process.env.API_KEY) {
+      throw new Error("API_KEY is not set");
+    }
     const res = await fetch("https://testvm1.rokt.io/api/jsonql", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": "c37861c7-7414-4a40-bbd8-3343662e4483",
+        "x-api-key": process.env.API_KEY,
       },
       body: JSON.stringify({
         authLogin: {
