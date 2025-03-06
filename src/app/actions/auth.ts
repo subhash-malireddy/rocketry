@@ -1,5 +1,6 @@
 "use server";
 import { login } from "@/auth";
+import { error } from "console";
 
 export const loginAction = async (_prevState: any, formData: FormData) => {
   const username = formData.get("email");
@@ -9,38 +10,32 @@ export const loginAction = async (_prevState: any, formData: FormData) => {
 
   const res = await login(username as string, password as string);
 
-  // Success case
   if (res && res.authLogin && res.authLogin.token) {
     return {
       success: true,
       message: "Login successful",
     };
-  }
-
-  // Fetch error case
-  if (res && res.error) {
-    return {
-      errors: {
-        fetchError: {
-          success: false,
-          errors: {
-            fetchError: {
-              error: res.error,
-              message: "Failed to fetch data",
-            },
+  } else {
+    if (res && res.error) {
+      return {
+        errors: {
+          fetchError: {
+            success: false,
+            message: "Failed to fetch data",
+            error: res.error,
           },
         },
-      },
-    };
+      };
+    } else {
+      return {
+        errors: {
+          serverError: {
+            success: false,
+            error: res.error,
+            message: "Server error",
+          },
+        },
+      };
+    }
   }
-
-  // Default server error case
-  return {
-    errors: {
-      serverError: {
-        error: res?.error,
-        message: "Server error",
-      },
-    },
-  };
 };
