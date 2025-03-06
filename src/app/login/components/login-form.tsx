@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect } from "react";
 
 export default function LoginForm() {
-  const [state, action, isPending] = useActionState(loginAction, undefined);
+  const [state, action, isPending] = useActionState(loginAction, null);
 
   const searchParams = useSearchParams();
   const nextUrl = searchParams.get("callbackUrl");
@@ -17,6 +17,12 @@ export default function LoginForm() {
       router.push(nextUrl || "/");
     }
   }, [state?.success, nextUrl]);
+
+  if (!state?.success) {
+    //a toast or alert indicating the faliure
+    //if an error boundary is setup, simply throw the error
+    console.error(state?.error);
+  }
 
   return (
     <form className="mt-8 space-y-6" action={action}>

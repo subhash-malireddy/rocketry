@@ -1,5 +1,13 @@
 import { cookies } from "next/headers";
 
+type SuccessfulLoginResponse = {
+  authLogin: {
+    firstname: string;
+    token: string;
+    refreshToken: string;
+  };
+};
+
 export const login = async (username: string, password: string) => {
   try {
     if (!process.env.API_KEY) {
@@ -23,7 +31,17 @@ export const login = async (username: string, password: string) => {
       }),
     });
 
+    if (!res.ok) throw new Error("Something went wrong");
+
     const resJson = await res.json();
+
+    //assuming server returns expected response structure with valid credentials
+    if (
+      resJson.authLogin === "invalid credentials" ||
+      !isSuccessfulLoginResponse(resJson)
+    )
+      throw new Error("Invalid credentials");
+
     const cookiesStore = await cookies();
     cookiesStore.set("token", resJson.authLogin.token, {
       sameSite: "strict",
@@ -38,3 +56,15 @@ export const login = async (username: string, password: string) => {
     return { error };
   }
 };
+
+export function isSuccessfulLoginResponse(
+  response: any
+): response is SuccessfulLoginResponse {
+  return (
+    response &&
+    typeof response === "object" &&
+    response.hasOwnProperty("firstname") &&
+    response.hasOwnProperty("token") &&
+    response.hasOwnProperty("refreshToken")
+  );
+}
